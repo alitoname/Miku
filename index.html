@@ -1,0 +1,391 @@
+-- Hatsune Miku Hub | Blox Fruits
+-- Loadstring ready | Delta Executor
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+local LocalPlayer = Players.LocalPlayer
+local Camera = workspace.CurrentCamera
+local Mouse = LocalPlayer:GetMouse()
+
+-- ==================== ANTI-DETECCIÓN ====================
+local function antiDetect()
+    pcall(function()
+        if getgenv then getgenv().MikuHubLoaded = true end
+        if syn and syn.protect_gui then
+            -- protección extra si el executor lo soporta
+        end
+    end)
+end
+antiDetect()
+
+-- ==================== SISTEMA DE KEY (Linkvertise) ====================
+local KeySystem = {
+    CorrectKey = "Miku2026", -- Cambia esta key por la que quieras
+    Link = https://link-center.net/9820841/8ddWqmocir04 -- Pon aquí tu link de Linkvertise
+    Verified = false
+}
+
+local function CheckKey(input)
+    if input == KeySystem.CorrectKey then
+        KeySystem.Verified = true
+        return true
+    end
+    return false
+end
+
+-- ==================== GUI PRINCIPAL ====================
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "HatsuneMikuHub"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+ScreenGui.Parent = game:GetService("CoreGui")
+
+-- Protección anti-detección de GUI
+pcall(function()
+    if syn and syn.protect_gui then
+        syn.protect_gui(ScreenGui)
+    elseif protect_gui then
+        protect_gui(ScreenGui)
+    end
+end)
+
+-- Frame principal
+local MainFrame = Instance.new("Frame")
+MainFrame.Name = "Main"
+MainFrame.Size = UDim2.new(0, 420, 0, 320)
+MainFrame.Position = UDim2.new(0.5, -210, 0.5, -160)
+MainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 30)
+MainFrame.BorderSizePixel = 0
+MainFrame.Active = true
+MainFrame.Draggable = true
+MainFrame.Parent = ScreenGui
+
+local UICorner = Instance.new("UICorner")
+UICorner.CornerRadius = UDim.new(0, 12)
+UICorner.Parent = MainFrame
+
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, 0, 0, 40)
+Title.BackgroundColor3 = Color3.fromRGB(255, 105, 180)
+Title.Text = "Hatsune Miku Hub"
+Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 20
+Title.Parent = MainFrame
+
+local TitleCorner = Instance.new("UICorner")
+TitleCorner.CornerRadius = UDim.new(0, 12)
+TitleCorner.Parent = Title
+
+local CloseBtn = Instance.new("TextButton")
+CloseBtn.Size = UDim2.new(0, 30, 0, 30)
+CloseBtn.Position = UDim2.new(1, -35, 0, 5)
+CloseBtn.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
+CloseBtn.Text = "X"
+CloseBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+CloseBtn.Font = Enum.Font.GothamBold
+CloseBtn.TextSize = 16
+CloseBtn.Parent = MainFrame
+
+local CloseCorner = Instance.new("UICorner")
+CloseCorner.CornerRadius = UDim.new(0, 6)
+CloseCorner.Parent = CloseBtn
+
+-- ==================== CUADRO FLOTANTE MIKU ====================
+local MikuButton = Instance.new("ImageButton")
+MikuButton.Name = "MikuFloat"
+MikuButton.Size = UDim2.new(0, 70, 0, 70)
+MikuButton.Position = UDim2.new(0, 20, 0.5, -35)
+MikuButton.BackgroundColor3 = Color3.fromRGB(255, 105, 180)
+MikuButton.Image = "rbxassetid://13198576721" -- Imagen de Miku (puedes cambiar el ID)
+MikuButton.ScaleType = Enum.ScaleType.Crop
+MikuButton.Visible = false
+MikuButton.Parent = ScreenGui
+
+local MikuCorner = Instance.new("UICorner")
+MikuCorner.CornerRadius = UDim.new(1, 0)
+MikuCorner.Parent = MikuButton
+
+local MikuStroke = Instance.new("UIStroke")
+MikuStroke.Color = Color3.fromRGB(255, 255, 255)
+MikuStroke.Thickness = 2
+MikuStroke.Parent = MikuButton
+
+-- ==================== KEY SYSTEM UI ====================
+local KeyFrame = Instance.new("Frame")
+KeyFrame.Size = UDim2.new(1, -20, 1, -50)
+KeyFrame.Position = UDim2.new(0, 10, 0, 45)
+KeyFrame.BackgroundTransparency = 1
+KeyFrame.Parent = MainFrame
+
+local KeyLabel = Instance.new("TextLabel")
+KeyLabel.Size = UDim2.new(1, 0, 0, 30)
+KeyLabel.BackgroundTransparency = 1
+KeyLabel.Text = "Ingresa la Key:"
+KeyLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+KeyLabel.Font = Enum.Font.Gotham
+KeyLabel.TextSize = 16
+KeyLabel.Parent = KeyFrame
+
+local KeyBox = Instance.new("TextBox")
+KeyBox.Size = UDim2.new(1, 0, 0, 35)
+KeyBox.Position = UDim2.new(0, 0, 0, 35)
+KeyBox.BackgroundColor3 = Color3.fromRGB(40, 40, 55)
+KeyBox.Text = ""
+KeyBox.PlaceholderText = "Escribe la key aquí..."
+KeyBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+KeyBox.Font = Enum.Font.Gotham
+KeyBox.TextSize = 14
+KeyBox.Parent = KeyFrame
+
+local KeyBoxCorner = Instance.new("UICorner")
+KeyBoxCorner.CornerRadius = UDim.new(0, 8)
+KeyBoxCorner.Parent = KeyBox
+
+local GetKeyBtn = Instance.new("TextButton")
+GetKeyBtn.Size = UDim2.new(0.48, 0, 0, 35)
+GetKeyBtn.Position = UDim2.new(0, 0, 0, 80)
+GetKeyBtn.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
+GetKeyBtn.Text = "Obtener Key"
+GetKeyBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+GetKeyBtn.Font = Enum.Font.GothamBold
+GetKeyBtn.TextSize = 14
+GetKeyBtn.Parent = KeyFrame
+
+local GetKeyCorner = Instance.new("UICorner")
+GetKeyCorner.CornerRadius = UDim.new(0, 8)
+GetKeyCorner.Parent = GetKeyBtn
+
+local SubmitBtn = Instance.new("TextButton")
+SubmitBtn.Size = UDim2.new(0.48, 0, 0, 35)
+SubmitBtn.Position = UDim2.new(0.52, 0, 0, 80)
+SubmitBtn.BackgroundColor3 = Color3.fromRGB(255, 105, 180)
+SubmitBtn.Text = "Verificar"
+SubmitBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+SubmitBtn.Font = Enum.Font.GothamBold
+SubmitBtn.TextSize = 14
+SubmitBtn.Parent = KeyFrame
+
+local SubmitCorner = Instance.new("UICorner")
+SubmitCorner.CornerRadius = UDim.new(0, 8)
+SubmitCorner.Parent = SubmitBtn
+
+local StatusLabel = Instance.new("TextLabel")
+StatusLabel.Size = UDim2.new(1, 0, 0, 25)
+StatusLabel.Position = UDim2.new(0, 0, 0, 125)
+StatusLabel.BackgroundTransparency = 1
+StatusLabel.Text = ""
+StatusLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
+StatusLabel.Font = Enum.Font.Gotham
+StatusLabel.TextSize = 13
+StatusLabel.Parent = KeyFrame
+
+-- ==================== CONTENIDO PRINCIPAL (después de key) ====================
+local ContentFrame = Instance.new("Frame")
+ContentFrame.Size = UDim2.new(1, -20, 1, -50)
+ContentFrame.Position = UDim2.new(0, 10, 0, 45)
+ContentFrame.BackgroundTransparency = 1
+ContentFrame.Visible = false
+ContentFrame.Parent = MainFrame
+
+-- Toggles
+local function CreateToggle(name, posY)
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(1, 0, 0, 35)
+    btn.Position = UDim2.new(0, 0, 0, posY)
+    btn.BackgroundColor3 = Color3.fromRGB(40, 40, 55)
+    btn.Text = name .. ": OFF"
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.Font = Enum.Font.Gotham
+    btn.TextSize = 14
+    btn.Parent = ContentFrame
+
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 8)
+    corner.Parent = btn
+
+    return btn
+end
+
+local ESPPlayersBtn = CreateToggle("ESP Jugadores", 10)
+local ESPNPCBtn = CreateToggle("ESP NPCs", 55)
+local AimbotBtn = CreateToggle("Aimbot", 100)
+local FPS60Btn = CreateToggle("FPS 60", 145)
+local FPS50Btn = CreateToggle("FPS 50", 190)
+
+-- ==================== VARIABLES DE ESTADO ====================
+local Settings = {
+    ESPPlayers = false,
+    ESPNPC = false,
+    Aimbot = false,
+    FPS = 60
+}
+
+-- ==================== ESP ====================
+local ESPFolder = Instance.new("Folder")
+ESPFolder.Name = "MikuESP"
+ESPFolder.Parent = ScreenGui
+
+local function ClearESP()
+    for _, v in pairs(ESPFolder:GetChildren()) do
+        v:Destroy()
+    end
+end
+
+local function CreateESP(obj, color, text)
+    local billboard = Instance.new("BillboardGui")
+    billboard.Name = obj.Name
+    billboard.Adornee = obj:FindFirstChild("HumanoidRootPart") or obj.PrimaryPart or obj:FindFirstChildWhichIsA("BasePart")
+    billboard.Size = UDim2.new(0, 100, 0, 40)
+    billboard.StudsOffset = Vector3.new(0, 3, 0)
+    billboard.AlwaysOnTop = true
+    billboard.Parent = ESPFolder
+
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.new(1, 0, 1, 0)
+    label.BackgroundTransparency = 1
+    label.Text = text
+    label.TextColor3 = color
+    label.TextStrokeTransparency = 0.5
+    label.Font = Enum.Font.GothamBold
+    label.TextSize = 14
+    label.Parent = billboard
+end
+
+local function UpdateESP()
+    ClearESP()
+    if not (Settings.ESPPlayers or Settings.ESPNPC) then return end
+
+    for _, plr in pairs(Players:GetPlayers()) do
+        if Settings.ESPPlayers and plr \~= LocalPlayer and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") then
+            CreateESP(plr.Character, Color3.fromRGB(0, 255, 100), plr.Name)
+        end
+    end
+
+    if Settings.ESPNPC then
+        for _, obj in pairs(workspace:GetDescendants()) do
+            if obj:IsA("Model") and obj:FindFirstChild("Humanoid") and not Players:GetPlayerFromCharacter(obj) then
+                local hrp = obj:FindFirstChild("HumanoidRootPart")
+                if hrp then
+                    CreateESP(obj, Color3.fromRGB(255, 100, 100), obj.Name)
+                end
+            end
+        end
+    end
+end
+
+-- ==================== AIMBOT ====================
+local function GetClosestEnemy()
+    local closest = nil
+    local shortest = math.huge
+
+    for _, plr in pairs(Players:GetPlayers()) do
+        if plr \~= LocalPlayer and plr.Character and plr.Character:FindFirstChild("HumanoidRootPart") and plr.Character:FindFirstChild("Humanoid") and plr.Character.Humanoid.Health > 0 then
+            local pos = plr.Character.HumanoidRootPart.Position
+            local dist = (pos - Camera.CFrame.Position).Magnitude
+            local screenPos, onScreen = Camera:WorldToViewportPoint(pos)
+
+            if onScreen and dist < shortest then
+                shortest = dist
+                closest = plr.Character.HumanoidRootPart
+            end
+        end
+    end
+    return closest
+end
+
+-- ==================== FPS OPTIMIZER ====================
+local function SetFPS(cap)
+    pcall(function()
+        if setfpscap then
+            setfpscap(cap)
+        end
+    end)
+    Settings.FPS = cap
+end
+
+-- ==================== CONEXIONES ====================
+CloseBtn.MouseButton1Click:Connect(function()
+    MainFrame.Visible = false
+    MikuButton.Visible = true
+end)
+
+MikuButton.MouseButton1Click:Connect(function()
+    MainFrame.Visible = true
+    MikuButton.Visible = false
+end)
+
+GetKeyBtn.MouseButton1Click:Connect(function()
+    pcall(function()
+        setclipboard(KeySystem.Link)
+        StatusLabel.Text = "Link copiado! Pega en el navegador"
+        StatusLabel.TextColor3 = Color3.fromRGB(100, 255, 100)
+    end)
+end)
+
+SubmitBtn.MouseButton1Click:Connect(function()
+    if CheckKey(KeyBox.Text) then
+        StatusLabel.Text = "Key correcta! Acceso concedido"
+        StatusLabel.TextColor3 = Color3.fromRGB(100, 255, 100)
+        KeyFrame.Visible = false
+        ContentFrame.Visible = true
+    else
+        StatusLabel.Text = "Key incorrecta"
+        StatusLabel.TextColor3 = Color3.fromRGB(255, 80, 80)
+    end
+end)
+
+ESPPlayersBtn.MouseButton1Click:Connect(function()
+    Settings.ESPPlayers = not Settings.ESPPlayers
+    ESPPlayersBtn.Text = "ESP Jugadores: " .. (Settings.ESPPlayers and "ON" or "OFF")
+    ESPPlayersBtn.BackgroundColor3 = Settings.ESPPlayers and Color3.fromRGB(255, 105, 180) or Color3.fromRGB(40, 40, 55)
+end)
+
+ESPNPCBtn.MouseButton1Click:Connect(function()
+    Settings.ESPNPC = not Settings.ESPNPC
+    ESPNPCBtn.Text = "ESP NPCs: " .. (Settings.ESPNPC and "ON" or "OFF")
+    ESPNPCBtn.BackgroundColor3 = Settings.ESPNPC and Color3.fromRGB(255, 105, 180) or Color3.fromRGB(40, 40, 55)
+end)
+
+AimbotBtn.MouseButton1Click:Connect(function()
+    Settings.Aimbot = not Settings.Aimbot
+    AimbotBtn.Text = "Aimbot: " .. (Settings.Aimbot and "ON" or "OFF")
+    AimbotBtn.BackgroundColor3 = Settings.Aimbot and Color3.fromRGB(255, 105, 180) or Color3.fromRGB(40, 40, 55)
+end)
+
+FPS60Btn.MouseButton1Click:Connect(function()
+    SetFPS(60)
+    FPS60Btn.Text = "FPS 60: ON"
+    FPS50Btn.Text = "FPS 50: OFF"
+    FPS60Btn.BackgroundColor3 = Color3.fromRGB(255, 105, 180)
+    FPS50Btn.BackgroundColor3 = Color3.fromRGB(40, 40, 55)
+end)
+
+FPS50Btn.MouseButton1Click:Connect(function()
+    SetFPS(50)
+    FPS50Btn.Text = "FPS 50: ON"
+    FPS60Btn.Text = "FPS 60: OFF"
+    FPS50Btn.BackgroundColor3 = Color3.fromRGB(255, 105, 180)
+    FPS60Btn.BackgroundColor3 = Color3.fromRGB(40, 40, 55)
+end)
+
+-- Loop principal
+RunService.RenderStepped:Connect(function()
+    if Settings.ESPPlayers or Settings.ESPNPC then
+        UpdateESP()
+    else
+        ClearESP()
+    end
+
+    if Settings.Aimbot and UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton2) then
+        local target = GetClosestEnemy()
+        if target then
+            Camera.CFrame = CFrame.new(Camera.CFrame.Position, target.Position)
+        end
+    end
+end)
+
+-- Mensaje de carga
+print("Hatsune Miku Hub cargado correctamente")
